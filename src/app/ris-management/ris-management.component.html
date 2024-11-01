@@ -1,0 +1,85 @@
+
+<h5>{{languageService.i18n['ris.controller']}}
+  <mat-icon tooltip="{{languageService.i18n['ris.create']}}" (click)="openCreateModal()">add</mat-icon>
+</h5>
+<div *ngIf="isLoading" class="overlay"></div>
+<div class="table">
+  <table>
+    <thead>
+      <tr>
+        <th>{{languageService.i18n['table.header_name']}}</th>
+        <th>RIS Prefix URL</th>
+        <th>{{languageService.i18n['index.view']}}</th>
+        <th>{{languageService.i18n['table.delete']}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr [hidden]="allRisDevice.length === 0?true:false" *ngFor="let opt of allRisDevice | paginate: { itemsPerPage: pageSize, currentPage: p, totalItems: totalItems, id: 'display' } ">
+        <td>{{opt.name}}</td>
+        <td>{{opt.risUrl}}</td>
+        <td>
+          <mat-icon tooltip="{{languageService.i18n['view_detail']}}" (click)="viewPage(opt)">search</mat-icon>
+        </td>
+        <td>
+          <mat-icon tooltip="{{languageService.i18n['delItem']}}" (click)="openDeleteModal(opt)">delete_forever</mat-icon>
+        </td>
+      </tr>
+      <ng-template [ngIf]="allRisDevice === null || allRisDevice.length === 0">
+        <tr class="notFind">
+          <td colspan="5">{{languageService.i18n['no_results']}}</td>
+        </tr>
+      </ng-template>
+    </tbody>
+  </table>
+  <pagination-controls (pageChange)="pageChanged($event)" screenReaderPaginationLabel="Pagination" previousLabel=""
+    nextLabel="" id="display">
+  </pagination-controls>
+</div>
+
+<ng-template #createRISModal>
+  <h5>{{languageService.i18n['ris.create']}}</h5>
+  <form [formGroup]="createForm" >
+    <ul class="addcomponent-ul-li-label">
+      <li>
+        <label>{{languageService.i18n['ris.name']}}</label>
+        <span>
+          <input type="text" formControlName="name" class="{{formValidated&&createForm.controls['name'].invalid?'required':''}}">
+          <mat-error *ngIf="formValidated&&createForm.controls['name'].invalid">Required</mat-error>
+        </span>
+      </li>
+      <li>
+        <label>RIS URL</label>
+        <span>
+          <input type="text" formControlName="risUrl" class="ris-url-input {{formValidated&&createForm.controls['risUrl'].invalid?'required':''}}">
+          <mat-error *ngIf="formValidated&&createForm.controls['risUrl'].invalid">Required URL format</mat-error>
+        </span>
+    </ul>
+    <div class="buttons">
+      <button type="button" (click)="create()">OK</button>
+      <button type="button" mat-dialog-close>Cancel</button>
+    </div>
+  </form>
+</ng-template>
+
+<ng-template #deleteModal>
+  <h5>{{languageService.i18n['table.delete']}} RIS {{languageService.i18n['ris.device']}}
+  </h5>
+  <p>{{languageService.i18n['confirm_del_RIS']}} - {{selectRISDevice.name}} ?</p>
+  <div class="buttons">
+    <button type="button" (click)="delete()">Delete</button>
+    <button type="button" mat-dialog-close>Cancel</button>
+  </div>
+</ng-template>
+<ng-container *ngIf="isLoading">
+  <tr>
+    <td colspan="6">
+      <div class="progress-spinner-container">
+        
+        <!-- 指示器大小設置 -->
+        <mat-progress-spinner class="custom-spinner-color" mode="indeterminate" [diameter]="70"></mat-progress-spinner>
+        <span class="loading-text">{{languageService.i18n['ris.loading']}}</span>
+      </div>
+    </td>
+  </tr>
+</ng-container>
+

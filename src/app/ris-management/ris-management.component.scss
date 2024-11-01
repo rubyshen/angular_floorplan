@@ -1,0 +1,68 @@
+.progress-spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90px; 
+}
+.loading-text {
+  color: #7cbaec;
+  margin-right: 10px;
+  font-size: 20px;
+  font-weight: bold;
+}
+::ng-deep .mat-progress-spinner circle {
+  stroke: #7cbaec !important;
+}
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(51, 51, 51, 0.5);
+  z-index: 1;
+}
+.ris-url-input {
+  width: 300px;
+}
+.table table {
+  width: 98%;
+  margin: 0;
+  text-align: center;
+  max-height: 78vh;
+}
+table tr th {
+  width: 5vw;
+}
+table tr th:nth-child(1){
+  width: 44vw;
+}
+table tr td:nth-child(1){
+  text-align: left;
+}
+table tr th:nth-child(2){
+  width: 50vw;
+}
+table tr td:nth-child(2){
+  text-align: left;
+}
+td.action {
+  width: 3vw!important;
+}
+#createRISModal {
+  min-width:25vw;
+}
+#createRISModal ul li label {
+  width: 40%;
+  min-width: initial;
+  margin: 0;
+}
+@media screen and (max-width:1366px) {
+
+  td.action {
+    width: 4vw !important;
+  }
+  table tr th {
+    width: 9vw;
+  }
+}

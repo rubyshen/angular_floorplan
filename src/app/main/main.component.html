@@ -1,0 +1,83 @@
+<div class="wrap">
+  <div class="header"><img src="assets/img/logo.png">Athena Orchestrator – RIS Controller
+      <!--{{title}}-->
+
+      <mat-menu #menu="matMenu">
+        <button *ngFor="let opt of styles" (click)="changeStyle(opt)" mat-menu-item>
+          <mat-icon>{{styleType === opt.value?'radio_button_checked':'radio_button_unchecked'}}</mat-icon>
+          <span>{{opt.displayName}}</span>
+        </button>
+      </mat-menu>
+      <span class="header_btn">
+
+        <span class="switch" style="position: relative; top: 1px; right: 18px;" >
+          <mat-button-toggle-group name="language" [(ngModel)]="languageService.language" (ngModelChange)="languageService.toggleChange()">
+            <mat-button-toggle value="TW">中</mat-button-toggle>
+            <mat-button-toggle value="EN">EN</mat-button-toggle>
+          </mat-button-toggle-group>
+        </span>
+        <button style="position: relative; top: -3.5px; right: 22px;" 
+          tooltip="{{languageService.i18n['theme']}}" mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+          <mat-icon>format_color_fill</mat-icon>
+          <label>Change Color</label>
+        </button>
+        <button tooltip="{{languageService.i18n['logout_now']}}" class="logout" type="button" (click)="logout()">
+          <mat-icon>logout</mat-icon>
+        </button>
+
+      </span>
+
+    <div class="menu">
+      <ul>
+        <ng-container *ngIf="userRole == 1; else regularMenu">
+          <li (click)="changePage(pageRourter['account-management'])" class="{{page === 'account-management'?'active':''}}" tooltip="{{languageService.i18n['index.menu_accountMgr']}}"><mat-icon>account_circle</mat-icon><label>{{languageService.i18n['index.menu_accountMgr']}}</label></li>
+      </ng-container>
+      <ng-template #regularMenu>
+        <li (click)="changePage(pageRourter['ris-management'])" class="{{page === 'ris-management'?'active':''}}"><mat-icon>dashboard</mat-icon><label>{{languageService.i18n['ris.controller']}}</label></li>
+        <li (click)="changePage(pageRourter['architecture-management'])" class="{{page === 'architecture-management'?'active':''}}" ><mat-icon>map</mat-icon><label>{{languageService.i18n['architecture.mgmt']}}</label></li>
+        <!-- <li (click)="changePage(pageRourter['planner-management'])" class="{{page === 'planner-management'?'active':''}}" ><mat-icon>map</mat-icon><label>{{languageService.i18n['planner.controller']}}</label></li> -->
+        <!-- <li (click)="changePage(pageRourter['dashboard'])" class="{{page === 'dashboard'?'active':''}}" tooltip="{{languageService.i18n['index.menu_dashboard']}}"><mat-icon>dashboard</mat-icon><label>{{languageService.i18n['index.menu_dashboard']}}</label></li> -->
+        <!-- <li (click)="changePage(pageRourter['fault-management'])" class="{{page === 'fault-management'?'active':''}}" tooltip="{{languageService.i18n['index.menu_faultMgr']}}"><mat-icon>warning</mat-icon><label>{{languageService.i18n['index.menu_faultMgr']}}</label></li> -->
+
+        <!-- 
+        <li (click)="changePage(pageRourter['field-management'])" class="{{page === 'field-management'?'active':''}}" tooltip="{{languageService.i18n['index.menu_fieldMgr']}}"><mat-icon>map</mat-icon><label>{{languageService.i18n['index.menu_fieldMgr']}}</label></li>
+        <li (click)="changePage(pageRourter['bs-management'])" class="{{page === 'bs-management'?'active':''}}" tooltip="{{languageService.i18n['index.menu_BSMgr']}}"><mat-icon svgIcon="BaseStation" class="svg-icon_BS"></mat-icon><label>{{languageService.i18n['index.menu_BSMgr']}}</label></li>
+        <li (click)="changePage(pageRourter['component-management'])" class="{{page === 'component-management'?'active':''}}" tooltip="{{languageService.i18n['index.menu_componentMgr']}}"><mat-icon>view_in_ar</mat-icon><label>{{languageService.i18n['index.menu_componentMgr']}}</label></li>
+        <li (click)="changePage(pageRourter['performance-management'])" class="{{page === 'performance-management'?'active':''}}" tooltip="{{languageService.i18n['index.menu_performMgr']}}"><mat-icon>trending_up</mat-icon><label>{{languageService.i18n['index.menu_performMgr']}}</label></li>
+        <li (click)="changePage(pageRourter['software-management'])" class="{{page === 'software-management'?'active':''}}" tooltip="{{languageService.i18n['index.menu_softwareMgr']}}"><mat-icon>display_settings</mat-icon><label>{{languageService.i18n['index.menu_softwareMgr']}}</label></li>     
+        <li (click)="changePage(pageRourter['schedule-management'])" class="{{page === 'schedule-management'?'active':''}}" tooltip="{{languageService.i18n['index.menu_scheduleMgr']}}">	<mat-icon>schedule</mat-icon><label>{{languageService.i18n['index.menu_scheduleMgr']}}</label></li>
+        <li (click)="changePage(pageRourter['log-management'])" class="{{page === 'log-management'?'active':''}}" tooltip="{{languageService.i18n['index.menu_logMgr']}}"><mat-icon>fact_check</mat-icon><label>{{languageService.i18n['index.menu_logMgr']}}</label></li> -->
+      </ng-template>
+      </ul>
+    </div>
+  </div>
+  <div class="menu">
+    <ul>
+      <ng-container *ngIf="userRole == 1; else regularMenu">
+        <li (click)="changePage(pageRourter['account-management'])" class="{{page === 'account-management'?'active':''}}"><mat-icon>account_circle</mat-icon><label>{{languageService.i18n['index.menu_accountMgr']}}</label></li>
+    </ng-container>
+    <ng-template #regularMenu>
+      <li (click)="changePage(pageRourter['ris-management'])" class="{{page === 'ris-management'?'active':''}}" ><mat-icon>cloud</mat-icon><label>{{languageService.i18n['ris.controller']}}</label></li>
+      <li (click)="changePage(pageRourter['architecture-management'])" class="{{page === 'architecture-management'?'active':''}}"><mat-icon>map</mat-icon><label>{{languageService.i18n['architecture.mgmt]}}</label></li>
+      <!-- <li (click)="changePage(pageRourter['planner-management'])" class="{{page === 'planner-management'?'active':''}}"><mat-icon>map</mat-icon><label>{{languageService.i18n['planner.controller]}}</label></li> -->
+      <!-- <li (click)="changePage(pageRourter['dashboard'])" class="{{page === 'dashboard'?'active':''}}" ><mat-icon>dashboard</mat-icon><label>{{languageService.i18n['index.menu_dashboard']}}</label></li> -->
+      <!-- <li (click)="changePage(pageRourter['fault-management'])" class="{{page === 'fault-management'?'active':''}}" ><mat-icon>warning</mat-icon><label>{{languageService.i18n['index.menu_faultMgr']}}</label></li> -->
+      
+      <!-- 
+      <li (click)="changePage(pageRourter['field-management'])" class="{{page === 'field-management'?'active':''}}"><mat-icon>map</mat-icon><label>{{languageService.i18n['index.menu_fieldMgr']}}</label></li>
+      <li (click)="changePage(pageRourter['bs-management'])" class="{{page === 'bs-management'?'active':''}}"><mat-icon svgIcon="BaseStation" class="svg-icon_BS"></mat-icon><label>{{languageService.i18n['index.menu_BSMgr']}}</label></li>
+      <li (click)="changePage(pageRourter['component-management'])" class="{{page === 'component-management'?'active':''}}"><mat-icon>view_in_ar</mat-icon><label>{{languageService.i18n['index.menu_componentMgr']}}</label></li>
+      <li (click)="changePage(pageRourter['performance-management'])" class="{{page === 'performance-management'?'active':''}}" ><mat-icon>trending_up</mat-icon><label>{{languageService.i18n['index.menu_performMgr']}}</label></li>
+      <li (click)="changePage(pageRourter['software-management'])" class="{{page === 'software-management'?'active':''}}"><mat-icon>display_settings</mat-icon><label>{{languageService.i18n['index.menu_softwareMgr']}}</label></li>
+      <li (click)="changePage(pageRourter['schedule-management'])" class="{{page === 'schedule-management'?'active':''}}"><mat-icon>schedule</mat-icon><label>{{languageService.i18n['index.menu_scheduleMgr']}}</label></li>
+      <li (click)="changePage(pageRourter['log-management'])" class="{{page === 'log-management'?'active':''}}"><mat-icon>fact_check</mat-icon><label>{{languageService.i18n['index.menu_logMgr']}}</label></li> -->
+    </ng-template>
+    </ul>
+  </div>
+  <div class="content">
+    <router-outlet></router-outlet>
+  </div>
+  <div class="footer">
+    <p>Copyright © 2024 ITRI.</p>
+  </div>
+</div>

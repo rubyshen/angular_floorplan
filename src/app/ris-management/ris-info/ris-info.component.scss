@@ -1,0 +1,435 @@
+h5 {
+  margin: 0 0 0 auto;
+}
+.table table {
+  display: table;
+  width: 96%;
+  margin: auto;
+  border-collapse: collapse;
+}
+.table {
+  max-height: 800px;
+  overflow-y: auto;
+}
+
+.running-hr {
+  width: 127px;
+  margin: 0.3em 0;
+}
+//6G-SandBox
+//loading
+.progress-spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90px; 
+}
+.loading-text {
+  color: #7cbaec;
+  margin-right: 10px;
+  font-size: 20px;
+  font-weight: bold;
+}
+::ng-deep .mat-progress-spinner circle {
+  stroke: #7cbaec !important;
+}
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(51, 51, 51, 0.5);
+  z-index: 1;
+}
+
+//loading
+.profileinfo ul li {
+  margin: 0 0 1em 1em;
+  width: 100%;
+}
+.profileinfo ul li label::after {
+  content: ':';
+  // margin: 0 3px;
+}
+.element-array-container {
+  margin-left: 8em;
+}
+.not-allowed {cursor: not-allowed;}
+
+.element-array-container span {
+  color:#d5d5d5
+}
+table caption {
+  color:#d5d5d5
+}
+.content-inner-flex {
+  display: flex;
+  height: 24em;
+}
+
+.content-inner-flex > .risInfo-element {
+  flex: 1 1; 
+}
+.square {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  line-height: 3em;
+}
+.red-square {
+  background-color: rgb(233, 79, 79);
+  color:#d5d5d5
+}
+.green-square {
+  background-color: skyblue; 
+  color:#d5d5d5
+}
+.tables-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  height: 24em;
+}
+.elementtable table {
+  background-color: skyblue;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.elementtable td {
+  border: 1px solid black;
+  padding: 0;
+  text-align: center;
+  transition: background-color 0.3s;
+}
+.apply-icon {
+  color: green;
+}
+
+.custom-modal {
+  max-height: 250em;
+  padding: 1.5rem 1rem; 
+  box-sizing: border-box;
+}
+
+.table table {
+  width: 98%;
+  margin: 0;
+  text-align: center;
+  max-height: 78vh;
+}
+table tr th {
+  width: 5vw;
+}
+table tr th:nth-child(1){
+  width: 8vw;
+}
+table tr th:nth-child(4){
+  width: 7vw;
+}
+table tr th:nth-child(5){
+  width: 7vw;
+}
+
+//fault table
+
+.fault-table table tr th {
+  width: 5vw;
+}
+.fault-table table tr th:nth-child(1){
+  width: 10vw;
+}
+.fault-table table tr th:nth-child(6){
+  width: 11vw;
+}
+//6G
+
+.main.collabsible {
+  width: 95%;
+}
+.main.collabsible > div .lbl-toggle {
+  position: absolute;
+  top: -.6em;
+  width: 2em;
+  padding: 0.5em 1em;
+  cursor: pointer;
+  transition: all 0.25s ease-out;
+}
+.collabsible { 
+  margin: 1.2rem 0;
+  font-size: 16px;
+  padding: 0 0em;
+ } 
+.collabsible > div input.toggle[type='checkbox'] { 
+  display: none; 
+} 
+.collabsible > div {
+  margin: .5em 0 2em 0;
+  padding: 2em 0 0 0;
+  position: relative;
+}
+.collabsible > div > span:first-child {
+  position: absolute;
+  left: 0;
+  top: -9px;
+  line-height: 2;
+  padding: 0 0 0 2em;
+  border-radius: 5px 5px 0 0;
+  width: 100%;
+  height: 41px;
+  font-family: Microsoft JhengHei;
+  color: #fff;
+  background:linear-gradient(to right, #1d8ee5 0%, #1e5799 100%);
+  font-weight: bold;
+  font-size: 17px;
+  text-align: left;
+}
+.content-inner .collabsible > div > span:first-child {
+  background:linear-gradient(to right, #1d8ee5be 0%, #1e5799da 100%);
+}
+.collabsible .lbl-toggle {
+  display: block;
+  text-align: left;
+  padding: 0.5em 1em;
+  color: #b0ceff;
+  cursor: pointer;
+  border-radius: 7px 7px 0 0;
+  transition: all 0.25s ease-out;
+}
+
+.collabsible .lbl-toggle::before { 
+  content: ' '; 
+  color: #fff;
+  display: inline-block; 
+  border-top: 5px solid transparent; 
+  border-bottom: 5px solid transparent; 
+  border-left: 5px solid currentColor; 
+  vertical-align: middle; 
+  margin-right: .7rem; 
+  transform: translateY(-2px); 
+  transition: transform .2s ease-out;
+  transform: rotate(90deg) translateX(-3px);
+ } 
+.collabsible .toggle:checked + .lbl-toggle::before { 
+  transform: rotate(0deg) translateX(0px); 
+} 
+.collapsible-content { 
+  max-height: 56vh; 
+  overflow: auto; 
+  transition: max-height .25s ease-in-out; 
+} 
+.collabsible .toggle:checked + .lbl-toggle + .collapsible-content { 
+  max-height: 0;
+  overflow: hidden;
+} 
+.collapsible-content .collapsible-content {
+  max-height: 38vh;
+}
+.collabsible .toggle:checked+.lbl-toggle { 
+  border-radius: 7px;
+} 
+.collabsible span > span {
+  display: inline-block;
+  margin: 0 0 0 1em;
+  font-size: .9em;
+  padding: 0;
+}
+.collabsible span button {
+  background-color:#ba5a2a  ;
+  border-radius: 50em;
+  cursor: pointer;
+  font-size: 0.85em;
+  padding: 0.3em 0.7em;
+  vertical-align: middle;
+  margin: 0 0 0 0.5em;
+  border: 0;
+  color: #fff;
+}
+.collabsible span .material-symbols-outlined {
+  padding: 0;
+  margin: 0;
+  font-size: 22px;
+  vertical-align: middle;
+}
+.collabsible  span select {
+  padding: 3px 5px;
+  border-radius: 3px;
+  margin: 5px;
+  border: 0;
+}
+.collapsible-content .content-inner { 
+  background-color: #0d2032e6;
+  border-bottom-left-radius: 7px;
+  border-bottom-right-radius: 7px;
+  padding: 0 1rem; 
+  color: #333;
+  border: 1px solid #223b50;
+} 
+.collapsible-content p { margin-bottom: 0; }
+.collabsible .content-inner ul {
+  margin: 0 0 0 2em;
+}
+.collabsible .content-inner ul li {
+  color: #d5d5d5;
+  line-height: 1.5;
+  font-size: 16px;
+}
+.collabsible .content-inner ul li label {
+  width: auto;
+  display: inline-block;
+}
+// div.risInfo .content-inner ul li label {
+//   width: 17em;
+// }
+.collabsible .content-inner ul li::marker {
+  color: #5a8bdd;
+}
+.collabsible .content-inner ul li label::after {
+  content: ':';
+  margin: 0 3px;
+}
+.collabsible table th {
+  font-size: 1em;
+  text-align: center;
+}
+
+.collabsible .filter {
+  text-align: center;
+  background-color: #acb8c7c2;
+}
+.collabsible .filter .material-icons,
+.collabsible .filter .material-symbols-outlined {
+  color: #ffffff;
+  border: 1px solid #ddd;
+  background: #4180b7;
+  font-size: 20px;
+}
+/**/
+.content-inner .panel {
+  width: 97%;
+  display: block;
+  margin: auto;
+}
+.collabsible .content-inner .panel ul li label {
+  min-width: 5em;
+}
+.content-inner .panel > label {
+  display: inline-block;
+  vertical-align: top;
+  cursor: pointer;
+  margin: 1em 0.5em;
+  background-color: #fff;
+  padding: 1em 3em 1em 0.5em;
+  border-radius: 5px;
+  border-top: 6px solid #399df3;
+  position: relative;
+  width: 15.6em;
+  min-height: 11.5em;
+  z-index: 1;
+}
+.content-inner .panel > label ul li {
+  width: 110%;
+}
+.content-inner .panel > label input[type="radio"] {
+  position: absolute;
+  right: 1em;
+  z-index: 999;
+}
+.content-inner .panel > label input[type="radio"]:hover::after {
+  color:#337ab78a;
+  transition: all .25s ;
+}
+.content-inner .panel > label input[type="radio"]::after {
+  content: "\e1c4";
+  font-family: "Material Icons" !important;
+  font-size: 30px;
+  cursor: pointer;
+  top: -13px;
+  right: -9px;
+  position: absolute;
+  background-color: #fff;
+  color: #c1c1c1;
+} 
+.content-inner .panel > label input[type="radio"]:checked::after  {
+  content: "\ef71";
+  color: #6199f3;
+  top: -10px;
+  background-color: #fff7a6;
+  border: 1px solid #97beef;
+  border-radius: 5em;
+  width: 28px;
+  height: 30px;
+  line-height: 30px;
+  font-size: 28px;
+}
+.content-inner .panel > label input[type="radio"]:checked + div {
+  background-color: #fff7a6ba;
+  display: block;
+  width: 100%;
+  padding: 1em 3em 1.1em 0.5em;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 0 0 5px 5px;
+}
+.table {
+  margin: 1em 0;
+}
+.ocloudInfo.component .table tr td{
+  text-align: center;
+}
+
+@media screen and (max-width:1680px) {
+  .h30 {
+    height: 24em;
+}
+}
+@media only screen and (max-width:1600px) {
+  .percent{
+    margin: 1.5em 0.5em;
+  }
+}
+:host ::ng-deep .footer {
+  position: fixed!important;
+  bottom: 0;
+}
+@media screen and (max-width:1366px) {
+  .h30 {
+    height: 22em;
+  }
+  .basicInfo ul {
+    font-size: .9em;
+  }
+  .table table td, .table table th {
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .basicInfo ul li span {
+    width: 85%;
+  }
+  .cpu span img {
+    margin: 0 0.5em 0 0;
+    width: 2em;
+}
+.cpu span div {
+  font-size: .9em;
+  width: 72%;
+}
+.cpu span {
+  margin: .5% 0 2% 3%;
+  font-size: 1.3em;
+}
+.ocloudInfo.component {
+  max-height: 86vh;
+}
+.main.collabsible{
+  width: 100%;
+}
+.content-inner .panel > label input[type=radio] {
+  top: 1em;
+}
+.ocloudInfo.component {
+  max-height: 83vh;
+}
+}

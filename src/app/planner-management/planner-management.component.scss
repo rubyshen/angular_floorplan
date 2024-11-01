@@ -1,0 +1,82 @@
+.progress-spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90px; 
+}
+.loading-text {
+  color: #7cbaec;
+  margin-right: 10px;
+  font-size: 20px;
+  font-weight: bold;
+}
+::ng-deep .mat-progress-spinner circle {
+  stroke: #7cbaec !important;
+}
+.field-planner {
+  width: 95%;
+  height: 95%;
+  background-color: transparent;
+  position: relative;
+}
+
+#scatterChart {
+  background-color: whitesmoke /* Background color for the chart */
+  // border: 1px solid #ccc; /* Optional border */
+}
+
+.panel {
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ccc;
+  padding: 10px;
+  z-index: 100;
+}
+.map-legend {
+  width: 33%;
+  height: 9%;
+  position: relative;
+  //bottom: 5px;
+  background: #d7be78cf;
+  padding: 5px 5px 5px 5px;
+  z-index: 1000;
+  color: #000;
+}
+.map-legend > div {
+  display: inline-block;
+  vertical-align: middle;
+  margin: -11px 0.4em 0.3em 0.8em;
+}
+.map-legend img {
+  display: inline-block;
+  vertical-align: bottom;
+  margin: 0 0.5em 0 0;
+}
+.map-legend span {
+  display: inline-block;
+  width: 35px;
+}
+.map-legend label {
+  display: inline-block;
+  width: 46px;
+}
+.wall-icon {
+  display: inline-block;
+  width: 55px;
+  height: 20px;
+  background-color: black;
+}
+h5{
+  width: auto;
+}
+
+
+@media screen and (max-width:1366px) {
+
+  td.action {
+    width: 4vw !important;
+  }
+  table tr th {
+    width: 9vw;
+  }
+}

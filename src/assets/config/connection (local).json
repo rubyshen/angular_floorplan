@@ -1,0 +1,6 @@
+{
+  "local": false,
+  "url": "http://127.0.0.1",
+  "port": "30003",
+  "root": "/ris/itri/controller"
+}

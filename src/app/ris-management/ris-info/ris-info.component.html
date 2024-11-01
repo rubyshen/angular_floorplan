@@ -1,0 +1,248 @@
+<div class="ocloudInfo component">
+  <h5>
+    <button (click)="back()"><span class="material-icons">arrow_back</span>Back</button>
+    RIS {{languageService.i18n['ris.device']}} – {{name}}
+    <span tooltip="{{languageService.i18n['ris.logcsv']}}" class="material-icons" (click)="exportToCSV()">
+      <mat-icon svgIcon="export_to_csv"></mat-icon>
+    </span>
+    <span tooltip="{{languageService.i18n['index.faultMsg']}}" class="material-icons" (click)="alarm()">
+      <mat-icon (click)="openFaultModal()">error_outline</mat-icon>
+    </span>
+  </h5>
+<div *ngIf="isLoading" class="overlay"></div>
+  <div class="main collabsible">
+    <div class="risInfo">
+      <span>{{languageService.i18n['ris.info']}}:</span>
+      <input id="risInfo" class="toggle" type="checkbox">
+      <label for="risInfo" class="lbl-toggle"></label>
+      <div class="collapsible-content">
+        <div class="content-inner">
+          <div class="content-inner-flex">
+            <div class="risInfo-element">
+              <ul>
+                <li><label>{{languageService.i18n['ris.name']}}</label><span>{{ name }}</span></li>
+                <li><label>RIS Prefix URL</label><span>{{ risUrl }}</span></li>
+                <li><label>{{languageService.i18n['ris.status']}}</label>
+                  <span>{{ risInfo.status }}</span>
+                  <!-- <span *ngIf="risInfo.status === 'OFF'" class="greyLight"></span>
+                  <span *ngIf="risInfo.status === 'ON'" class="greenLight"></span> -->
+                </li>
+                <li><label>{{languageService.i18n['ris.dimension']}} (cm) {{languageService.i18n['ris.dimension.cal']}}</label><span>{{risInfo.dimension.rows}} x {{risInfo.dimension.columns}}</span></li>
+                <li><label>{{languageService.i18n['ris.size']}} {{languageService.i18n['ris.size.cal']}}</label><span>{{risInfo.size.width}} x {{risInfo.size.height}} x {{risInfo.size.depth}}</span></li>
+                <li><label>{{languageService.i18n['ris.position']}} (X,Y,Z)</label><span>{{risInfo.position.x}}, {{risInfo.position.y}}, {{risInfo.position.z}}</span></li>
+                <li><label>{{languageService.i18n['ris.orien.polar']}}</label><span>{{risInfo.orientation.polar}}</span></li>
+                <li><label>{{languageService.i18n['ris.orien.azimuth']}}</label><span>{{risInfo.orientation.azimuth}}</span></li>
+                
+                <li><label>{{languageService.i18n['ris.material']}}</label><span>{{risInfo.material}}</span></li>
+                <li><label>{{languageService.i18n['ris.temperature']}} (°C)</label><span>{{risInfo.temperature.value}}</span></li>
+                <li><label>{{languageService.i18n['ris.power']}}</label><span>{{risInfo.power_consumption.value}} W</span></li>
+                <hr class="running-hr">
+                <label style="color :#d5d5d5">Running Profile ID</label>
+                <hr class="running-hr">
+                <li><label>RIS Profile ID</label><span>{{risInfo.running_profile.id}}</span></li>
+                <li><label>{{languageService.i18n['ris.polar']}}</label><span>{{risInfo.running_profile.angle.polar}}</span></li>
+                <li><label>{{languageService.i18n['ris.azimuth']}}</label><span>{{risInfo.running_profile.angle.azimuth}}</span></li>
+              </ul>
+            </div>
+            <div class="element-array-container">
+              
+              <div class="elementtable">
+                <table>
+                  <caption style="caption-side:top">{{languageService.i18n['ris.vertical.element']}}</caption>
+                  <tr *ngFor="let row of risInfo.running_profile.vert_element_array; let i = index">
+                    <td *ngFor="let cell of row; let j = index" [ngStyle]="verticalcellStyle(i, j)"></td>
+                  </tr>
+                  <caption style="caption-side: bottom; text-align: center;">
+                    <span class="square red-square">ON</span>
+                    &nbsp;
+                    <span class="square green-square">OFF</span>
+                  </caption>
+                </table>
+              </div>
+              <!-- localcellStyle -->
+              <!-- <div class="elementtable">
+                <table>
+                  <caption style="caption-side:top">{{languageService.i18n['ris.vertical.element']}}</caption>
+                  <tr *ngFor="let row of tableData; let i = index">
+                    <td *ngFor="let cell of row; let j = index" [ngStyle]="localcellStyle(i, j)"></td> 
+                  </tr>
+                  <caption style="caption-side: bottom; text-align: center;">
+                    <span class="square red-square">ON</span>
+                    &nbsp;
+                    <span class="square green-square">OFF</span>
+                  </caption>
+                </table>
+              </div> -->
+              <!-- localcellStyle -->
+            </div>
+            
+            <div class="element-array-container">
+              <div class="elementtable">
+                <table>
+                  <caption style="caption-side:top">{{languageService.i18n['ris.horizontal.element']}}</caption>
+                  <tr *ngFor="let row of risInfo.running_profile.horz_element_array; let i = index">
+                    <td *ngFor="let cell of row; let j = index" [ngStyle]="horizontalcellStyle(i, j)"></td>
+                  </tr>
+                  <caption style="caption-side: bottom; text-align: center;">
+                    <span class="square red-square">ON</span>
+                    &nbsp;
+                    <span class="square green-square">OFF</span>
+                  </caption>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <span>{{languageService.i18n['ris.profile.list']}} – {{name}}</span>
+      <!-- remove -->
+      <!-- <input type="text" [(ngModel)]="elementRow" style="width: 30px;">
+      <input type="text" [(ngModel)]="elementColumn"style="width: 30px;">
+      <button (click)="submit()">Submit</button> -->
+      <!-- remove -->
+      <input id="cm" class="toggle" type="checkbox">
+      <label for="cm" class="lbl-toggle"></label>
+      <div class="collapsible-content" >
+        <div class="content-inner" >
+          <div class="table">
+            <table>
+              <thead>
+                <tr>
+                  <th>RIS Profile ID</th>
+                  <th>{{languageService.i18n['ris.polar']}}</th>
+                  <th>{{languageService.i18n['ris.azimuth']}}</th>
+                  <th>{{languageService.i18n['index.view']}}</th>
+                  <th>{{languageService.i18n['ris.applytable']}}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let profile of risProfile">
+                  <td>{{profile.profileid}}</td>
+                  <td>{{profile.angle.polar}}</td>
+                  <td>{{profile.angle.azimuth}}</td>
+                  <td>
+                    <mat-icon (click)="openrisProfileModal(profile)" tooltip="{{languageService.i18n['view_detail']}}">search</mat-icon>
+                  </td>
+                  <td>
+                    <ng-container *ngIf="risInfo.running_profile && risInfo.running_profile.id === profile.profileid">
+                      <mat-icon style="cursor: not-allowed;" class="apply-icon">check_circle</mat-icon>
+                  </ng-container>
+                  <ng-container *ngIf="risInfo.running_profile && risInfo.running_profile.id !== profile.profileid">
+                      <mat-icon (click)="openApplyModal(profile)"> check_circle_outline</mat-icon>
+                  </ng-container>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-container *ngIf="isLoading">
+  <tr>
+    <td colspan="6">
+      <div class="progress-spinner-container">
+        <mat-progress-spinner class="custom-spinner-color" mode="indeterminate" [diameter]="70"></mat-progress-spinner>
+        <span class="loading-text">{{languageService.i18n['ris.loading']}}</span>
+      </div>
+    </td>
+  </tr>
+</ng-container>
+
+<ng-template #viewRISProfile>
+  <h5>RIS {{languageService.i18n['ris.profile']}} {{languageService.i18n['table.viewDetail']}} </h5>
+  <div class = profileinfo>
+  <ul>
+    <li><label>RIS Profile ID</label><span>{{ selectRISprofileId.profileid }}</span></li>
+    <li><label>{{languageService.i18n['ris.polar']}}</label><span>{{selectRISprofileId.angle.polar}}</span></li>
+    <li><label>{{languageService.i18n['ris.azimuth']}}</label><span>{{selectRISprofileId.angle.azimuth}}</span></li>
+  </ul>
+</div>
+<ul>
+  <div class="tables-container">
+<div class="elementtable">
+  <table>
+    <caption style="caption-side:top">{{languageService.i18n['ris.vertical.element']}}</caption>
+    <tr *ngFor="let row of vertElementArray; let i = index">
+      <td *ngFor="let cell of row; let j = index" [ngStyle]="verticalcellprofile(i, j)"></td>
+    </tr>
+    <caption style="caption-side: bottom; text-align: center;">
+      <span class="square red-square">ON</span>
+      &nbsp;
+      <span class="square green-square">OFF</span>
+    </caption>
+  </table>
+</div>
+
+<div class="elementtable">
+  <table>
+    <caption style="caption-side:top">{{languageService.i18n['ris.horizontal.element']}}</caption>
+    <tr *ngFor="let row of horzElementArray; let i = index">
+      <td *ngFor="let cell of row; let j = index" [ngStyle]="horizontalcellprofile(i, j)"></td>
+    </tr>
+    <caption style="caption-side: bottom; text-align: center;">
+      <span class="square red-square">ON</span>
+      &nbsp;
+      <span class="square green-square">OFF</span>
+    </caption>
+  </table>
+</div>
+</div>
+</ul>
+</ng-template>
+
+<ng-template #applyRISModal>
+  <h5>{{languageService.i18n['ris.notice']}}</h5>
+  <p>{{languageService.i18n['ris.confirmapply']}} - RIS Profile ID {{selectRISprofileId.profileid}} ?</p>
+  <div class="buttons">
+    <button type="button"(click)="applyRisProfile()">Apply</button>
+    <button type="button" mat-dialog-close>
+      {{ languageService.i18n['cancel'] }}
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #faultRISModal>
+  <h5>{{languageService.i18n['index.faultMsg']}}</h5>
+  <div class="custom-modal">
+    <div class="table">
+      <div class="fault-table">
+        <table>
+          <thead>
+            <tr>
+              <th>{{languageService.i18n['time']}}</th>
+              <th>{{languageService.i18n['fm.severity']}}</th>
+              <th>{{languageService.i18n['faultContext']}}</th>
+              <th>{{languageService.i18n['fm.updatetime']}}</th>
+              <th>{{languageService.i18n['fm.status']}}</th>
+              <th>{{languageService.i18n['fm.cleared']}}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr [hidden]="alarmMessage.length === 0?true:false" *ngFor="let alarm of alarmMessage | paginate: { itemsPerPage: pageSize, currentPage: p, totalItems: totalItems, id: 'display' } ">
+            <!-- <tr *ngFor="let alarm of alarmMessage"> -->
+              <td>{{alarm.alarm_raised_time}}</td>
+              <td>{{alarm.severity}}</td>
+              <td>{{alarm.fault_text}}</td>
+              <td>{{alarm.alarm_updated_time}}</td>
+              <td><span *ngIf="alarm.is_cleared == false" class="redLight"></span>
+                <span *ngIf="alarm.is_cleared == true" class="greenLight"></span>
+              </td>
+              <td>{{alarm.alarm_cleared_time}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <pagination-controls (pageChange)="pageChanged($event)" screenReaderPaginationLabel="Pagination" previousLabel=""
+        nextLabel="" id="display">
+      </pagination-controls>
+    </div>
+  </div>
+</ng-template>
+
