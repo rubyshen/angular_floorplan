@@ -11,12 +11,11 @@ export class FloorPlanComponent implements OnInit {
   private realWidthMeters = 20;
   private realHeightMeters = 15;
 
-  // 設備的公尺位置定義
   private equipments = [
-    { type: 'BS', x: 5, y: 4, imageUrl: 'assets/img/gnb.png' },    // BS 位於 (5m, 4m)
-    { type: 'UE', x: 10, y: 8, imageUrl: 'assets/img/ue.png' },     // UE 位於 (10m, 8m)
-    { type: 'RIS', x: 15, y: 6, imageUrl: 'assets/img/ris.png' },   // RIS 位於 (15m, 6m)
-    { type: 'UE', x: 9, y: 7, imageUrl: 'assets/img/ue.png' }
+    { type: 'BS', name: 'Base Station 1', x: 5, y: 4, imageUrl: 'assets/img/gnb.png' },
+    { type: 'UE', name: 'User Equipment 1', x: 10, y: 8, imageUrl: 'assets/img/ue.png' },
+    { type: 'RIS', name: 'RIS Unit 1', x: 15, y: 6, imageUrl: 'assets/img/ris.png' },
+    { type: 'UE', name: 'User Equipment 2', x: 9, y: 7, imageUrl: 'assets/img/ue.png' }
   ];
 
   constructor() { }
@@ -58,19 +57,69 @@ export class FloorPlanComponent implements OnInit {
 
     // 確保背景圖先加載完成，再繪製設備
     backgroundImagePromise.then(() => {
+      // 初始化 Tooltip
+      const tooltip = new Konva.Text({
+        text: '',
+        fontSize: 16,
+        padding: 5,
+        visible: false,
+        fill: 'black',
+        zIndex: 999, // 設置較高的 zIndex 確保 tooltip 在最前面
+      });
+      layer.add(tooltip);
+      tooltip.moveToTop(); // 確保 tooltip 總是被移到最上層
+
+      // 函數用來顯示 tooltip
+      const showTooltip = (x: number, y: number, text: string) => {
+        tooltip.text(text);
+        tooltip.position({ x: x + 10, y: y + 10 });
+        tooltip.visible(true);
+        tooltip.moveToTop(); // 確保 tooltip 在所有元素上方
+        layer.batchDraw(); // 使用 batchDraw 以提高性能
+        console.log('Tooltip shown with text:', text);
+      };
+
+      // 函數用來隱藏 tooltip
+      const hideTooltip = () => {
+        tooltip.visible(false);
+        layer.batchDraw();
+        console.log('Tooltip hidden');
+      };
+
       const equipmentPromises = this.equipments.map((equipment) => {
         return new Promise<void>((resolve) => {
           Konva.Image.fromURL(equipment.imageUrl, (equipImage) => {
+            const equipmentId = encodeURIComponent(equipment.name);
             equipImage.setAttrs({
               x: equipment.x * scaleX,
               y: equipment.y * scaleY,
               width: 1 * scaleX, // 設備圖標的寬度（設為 1m 對應於畫布縮放後的寬度）
               height: 1 * scaleY, // 設備圖標的高度
               draggable: false, // 第一版不允許拖曳
-              id: equipment.type,
+              id: equipmentId, // 使用唯一的 name 作為 ID
+              zIndex: 1, // 設置較低的 zIndex
             });
             layer.add(equipImage);
             console.log(`${equipment.type} image loaded and added to layer.`);
+
+            // 設備懸停顯示 tooltip
+            equipImage.on('mouseover', () => {
+              console.log(`Mouse over ${equipment.name}`);
+              const xMeters = equipment.x;
+              const yMeters = equipment.y;
+              showTooltip(equipImage.x(), equipImage.y(), `${equipment.name}: x: ${xMeters}, y: ${yMeters}`);
+            });
+            equipImage.on('mousemove', () => {
+              console.log(`Mouse move over ${equipment.name}`);
+              const xMeters = equipment.x;
+              const yMeters = equipment.y;
+              showTooltip(equipImage.x(), equipImage.y(), `${equipment.name}: x: ${xMeters}, y: ${yMeters}`);
+            });
+            equipImage.on('mouseout', () => {
+              console.log(`Mouse out from ${equipment.name}`);
+              hideTooltip();
+            });
+
             resolve();
           });
         });
@@ -78,56 +127,6 @@ export class FloorPlanComponent implements OnInit {
 
       // 等待所有設備加載完成後再繪製
       Promise.all(equipmentPromises).then(() => {
-        // 初始化 Tooltip
-        const tooltip = new Konva.Text({
-          text: '',
-          fontSize: 16,
-          padding: 5,
-          visible: false,
-          fill: 'black',
-          backgroundColor: 'white',
-        });
-        layer.add(tooltip);
-
-        // 設備懸停顯示 tooltip
-        this.equipments.forEach((equipment) => {
-          const equipmentNode = layer.findOne(`#${equipment.type}`);
-          if (equipmentNode) {
-            equipmentNode.on('mouseover', () => {
-              console.log(`Mouse over ${equipment.type}`);
-              const xMeters = equipment.x;
-              const yMeters = equipment.y;
-              showTooltip(equipmentNode.x(), equipmentNode.y(), `${equipment.type}: x: ${xMeters}, y: ${yMeters}`);
-            });
-            equipmentNode.on('mousemove', () => {
-              console.log(`Mouse move over ${equipment.type}`);
-              const xMeters = equipment.x;
-              const yMeters = equipment.y;
-              showTooltip(equipmentNode.x(), equipmentNode.y(), `${equipment.type}: x: ${xMeters}, y: ${yMeters}`);
-            });
-            equipmentNode.on('mouseout', () => {
-              console.log(`Mouse out from ${equipment.type}`);
-              hideTooltip();
-            });
-          }
-        });
-
-        // 函數用來顯示 tooltip
-        const showTooltip = (x: number, y: number, text: string) => {
-          tooltip.text(text);
-          tooltip.position({ x: x + 10, y: y + 10 });
-          tooltip.visible(true);
-          layer.batchDraw(); // 使用 batchDraw 以提高性能
-          console.log('Tooltip shown with text:', text);
-        };
-
-        // 函數用來隱藏 tooltip
-        const hideTooltip = () => {
-          tooltip.visible(false);
-          layer.batchDraw();
-          console.log('Tooltip hidden');
-        };
-
         layer.draw();
       });
     });
