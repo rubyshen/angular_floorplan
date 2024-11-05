@@ -35,6 +35,10 @@
       <ng-template #regularMenu>
         <li (click)="changePage(pageRourter['ris-management'])" class="{{page === 'ris-management'?'active':''}}"><mat-icon>dashboard</mat-icon><label>{{languageService.i18n['ris.controller']}}</label></li>
         <li (click)="changePage(pageRourter['architecture-management'])" class="{{page === 'architecture-management'?'active':''}}" ><mat-icon>map</mat-icon><label>{{languageService.i18n['architecture.mgmt']}}</label></li>
+        <li (click)="changePage('/main/floor-plan')" class="{{page === 'floor-plan'?'active':''}}">
+          <mat-icon>layers</mat-icon> <!-- 使用合適的圖標，可以選擇您認為合適的圖標 -->
+          <label>{{languageService.i18n['floor.plan'] || 'Floor Plan'}}</label>
+        </li>
         <!-- <li (click)="changePage(pageRourter['planner-management'])" class="{{page === 'planner-management'?'active':''}}" ><mat-icon>map</mat-icon><label>{{languageService.i18n['planner.controller']}}</label></li> -->
         <!-- <li (click)="changePage(pageRourter['dashboard'])" class="{{page === 'dashboard'?'active':''}}" tooltip="{{languageService.i18n['index.menu_dashboard']}}"><mat-icon>dashboard</mat-icon><label>{{languageService.i18n['index.menu_dashboard']}}</label></li> -->
         <!-- <li (click)="changePage(pageRourter['fault-management'])" class="{{page === 'fault-management'?'active':''}}" tooltip="{{languageService.i18n['index.menu_faultMgr']}}"><mat-icon>warning</mat-icon><label>{{languageService.i18n['index.menu_faultMgr']}}</label></li> -->
@@ -59,6 +63,10 @@
     <ng-template #regularMenu>
       <li (click)="changePage(pageRourter['ris-management'])" class="{{page === 'ris-management'?'active':''}}" ><mat-icon>cloud</mat-icon><label>{{languageService.i18n['ris.controller']}}</label></li>
       <li (click)="changePage(pageRourter['architecture-management'])" class="{{page === 'architecture-management'?'active':''}}"><mat-icon>map</mat-icon><label>{{languageService.i18n['architecture.mgmt]}}</label></li>
+      <li (click)="changePage(pageRourter['floor-plan'])" class="{{page === 'floor-plan'?'active':''}}">
+        <mat-icon>map</mat-icon>
+        <label>{{languageService.i18n['floor.plan']}}</label>
+      </li>
       <!-- <li (click)="changePage(pageRourter['planner-management'])" class="{{page === 'planner-management'?'active':''}}"><mat-icon>map</mat-icon><label>{{languageService.i18n['planner.controller]}}</label></li> -->
       <!-- <li (click)="changePage(pageRourter['dashboard'])" class="{{page === 'dashboard'?'active':''}}" ><mat-icon>dashboard</mat-icon><label>{{languageService.i18n['index.menu_dashboard']}}</label></li> -->
       <!-- <li (click)="changePage(pageRourter['fault-management'])" class="{{page === 'fault-management'?'active':''}}" ><mat-icon>warning</mat-icon><label>{{languageService.i18n['index.menu_faultMgr']}}</label></li> -->

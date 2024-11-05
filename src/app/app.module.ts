@@ -12,6 +12,7 @@ import { ArchitectureManagementComponent } from './architecture-management/archi
 import { PlannerManagementComponent } from './planner-management/planner-management.component';
 import { RISManagementComponent } from './ris-management/ris-management.component';
 import { RISInfoComponent } from './ris-management/ris-info/ris-info.component';
+import { FloorPlanComponent } from './floor-plan/floor-plan.component';
 
 // API
 import { ApiForRISMgmt }    from './shared/api/For_RIS_Mgmt';
@@ -102,7 +103,7 @@ import { localNEList }            from './shared/local-files/NE/For_queryBsCompo
     PlannerManagementComponent,
     RISManagementComponent,
     RISInfoComponent, //6G-SandBox
-    //
+    FloorPlanComponent,  // 註冊 FloorPlanComponent
 
     
     // Pipe 管道

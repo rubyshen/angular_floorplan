@@ -17,7 +17,7 @@ export class MainComponent implements OnInit {
   title = 'Dashboard';
 
   page: 'dashboard' | 'ris-management' | 'architecture-management' | 'planner-management' | 'field-management' | 'bs-management' /* @12/27 Add by yuchen */ | 'fault-management' | 'performance-management' | 'software-management' | 
- 'schedule-management' /* @11/20 Add by yuchen */ | 'log-management' /* @10/25 Add by yuchen */ | 'account-management' | 'nf-management' = 'dashboard';
+ 'schedule-management' /* @11/20 Add by yuchen */ | 'log-management' /* @10/25 Add by yuchen */ | 'account-management' | 'nf-management' | 'floor-plan' = 'dashboard';
   styles: style[] = [
     { displayName: 'Dark Style', value: 'black' },
     { displayName: 'Light Style', value: 'bright' }
@@ -37,7 +37,8 @@ export class MainComponent implements OnInit {
     'schedule-management': '/main/schedule-mgr',   // @11/20 Add by yuchen
     'log-management': '/main/log-mgr',             // @10/25 Add by yuchen
     'account-management': '/main/account-mgr',
-    'nf-management': '/main/nf-mgr'
+    'nf-management': '/main/nf-mgr',
+    'floor-plan': '/main/floor-plan'
   }
   userRole: number | null = null;
   constructor(private router: Router, private route: ActivatedRoute, private commonService: CommonService, public languageService: LanguageService) { }

@@ -11,6 +11,7 @@ import { RISManagementComponent } from './ris-management/ris-management.componen
 import { RISInfoComponent } from './ris-management/ris-info/ris-info.component';
 import { PlannerManagementComponent } from './planner-management/planner-management.component';
 import { ArchitectureManagementComponent } from './architecture-management/architecture-management.component';
+import { FloorPlanComponent } from './floor-plan/floor-plan.component';
 
 // 主畫面 Portal
 //import { DashboardComponent } from './dashboard/dashboard.component';   // 主畫面
@@ -33,6 +34,9 @@ const routes: Routes = [
       },
       { 
         path: 'architecture-mgr', component: ArchitectureManagementComponent 
+      },
+      { 
+        path: 'floor-plan', component: FloorPlanComponent  // 新增的 Floor Plan 路由
       }
       
     ]
