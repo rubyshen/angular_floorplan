@@ -23,7 +23,7 @@ export class FloorPlanComponent implements OnInit {
     stage.add(layer);
 
     // 添加底圖
-    Konva.Image.fromURL('assets/floor-plan.png', (image) => {
+    Konva.Image.fromURL('assets/img/floor-plan.png', (image) => {
       image.setAttrs({
         x: 0,
         y: 0,
@@ -34,34 +34,43 @@ export class FloorPlanComponent implements OnInit {
       layer.draw();
     });
 
-    // 添加 BS、UE、RIS 的位置標示
-    const bs = new Konva.Circle({
-      x: 200,
-      y: 200,
-      radius: 20,
-      fill: 'red',
-      draggable: false, // 第一版不允許拖曳
+    // 添加 BS 的位置標示（使用圖片）
+    Konva.Image.fromURL('assets/img/gnb.png', (bsImage) => {
+      bsImage.setAttrs({
+        x: 200,
+        y: 150,
+        width: 50,
+        height: 50,
+        draggable: false, // 第一版不允許拖曳
+      });
+      layer.add(bsImage);
+      layer.draw();
     });
-    layer.add(bs);
 
-    const ue = new Konva.Circle({
-      x: 400,
-      y: 300,
-      radius: 20,
-      fill: 'blue',
-      draggable: false,
+    // 添加 UE 的位置標示（使用圖片）
+    Konva.Image.fromURL('assets/img/ue.png', (ueImage) => {
+      ueImage.setAttrs({
+        x: 300,
+        y: 300,
+        width: 50,
+        height: 50,
+        draggable: false,
+      });
+      layer.add(ueImage);
+      layer.draw();
     });
-    layer.add(ue);
 
-    const ris = new Konva.Circle({
-      x: 600,
-      y: 400,
-      radius: 20,
-      fill: 'green',
-      draggable: false,
+    // 添加 RIS 的位置標示（使用圖片）
+    Konva.Image.fromURL('assets/img/ris.png', (risImage) => {
+      risImage.setAttrs({
+        x: 300,
+        y: 200,
+        width: 50,
+        height: 50,
+        draggable: false,
+      });
+      layer.add(risImage);
+      layer.draw();
     });
-    layer.add(ris);
-
-    layer.draw();
   }
 }
