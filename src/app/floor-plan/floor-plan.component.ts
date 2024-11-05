@@ -8,14 +8,22 @@ import Konva from 'konva';
 })
 export class FloorPlanComponent implements OnInit {
 
+
+
   constructor() { }
 
   ngOnInit(): void {
+    const containerElement = document.getElementById('container');
+    const stageWidth = containerElement?.clientWidth || 800;
+    const stageHeight = containerElement?.clientHeight || 600;
+    
     // 初始化 Konva 舞台
     const stage = new Konva.Stage({
       container: 'container', // 容器 ID，對應 HTML 中的 div
-      width: 800, // 調整大小為需要的值
-      height: 600,
+      // width: 800, // 調整大小為需要的值
+      // height: 600,
+      width: stageWidth,
+      height: stageHeight,
     });
 
     // 創建圖層

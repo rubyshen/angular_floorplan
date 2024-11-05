@@ -1,4 +1,7 @@
 #container {
-    border: 1px solid #ccc; /* 給容器添加邊框方便查看 */
-  }
-  
+  width: 800px; /* 确保与 Konva 舞台宽度一致 */
+  height: 600px;
+  border: 2px solid yellow; /* 给容器添加边框方便查看 */
+  position: relative;
+  overflow: hidden; /* 隐藏溢出的部分 */
+}
