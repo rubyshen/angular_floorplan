@@ -158,13 +158,13 @@ export class FloorPlanComponent implements OnInit {
           fontStyle: 'bold',
         });
 
-        // closeButton.on('click', () => {
-        //   console.log('Close button clicked');
-        //   this.stopUpdatingRsrp();
-        // });
+        closeButton.on('click', () => {
+          console.log('Close button clicked');
+          this.stopUpdatingRsrp();
+        });
 
         closeButtonText.on('click', () => {
-          console.log('Close button clicked');
+          console.log('Close button Text clicked');
           this.stopUpdatingRsrp();
         });
 
