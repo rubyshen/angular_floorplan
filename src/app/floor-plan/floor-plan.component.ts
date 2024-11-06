@@ -19,7 +19,14 @@ export class FloorPlanComponent implements OnInit {
     { type: 'UE', name: 'User Equipment 2', x: 9, y: 7, imageUrl: 'assets/img/ue.png', apiUrl: 'http://localhost:5000/rsrp' }
   ];
 
-  private tooltip!: Konva.Text;
+  private tooltip!: Konva.Text; // 用於設備懸停的 tooltip
+  private rsrpText!: Konva.Text; // 用於顯示 UE 的 RSRP 值的文字框
+  private closeButton!: Konva.Rect; // 關閉按鈕
+
+  // 存儲目前正在查詢 RSRP 的 UE 的相關資訊
+  selectedUeName: string | null = null;
+  rsrpValue: string | null = null;
+  rsrpInterval: any;
 
   constructor(private http: HttpClient) { }
 
@@ -74,10 +81,15 @@ export class FloorPlanComponent implements OnInit {
             layer.add(equipImage);
             console.log(`${equipment.type} image loaded and added to layer.`);
 
-            // 當點擊 UE 時，查詢即時 RSRP 值
+            // 當點擊 UE 時，查詢即時 RSRP 值並開始不斷刷新
             if (equipment.type === 'UE' && equipment.apiUrl) {
               equipImage.on('click', () => {
-                this.queryRsrp(equipment.apiUrl as string, equipment.name);
+                if (this.selectedUeName === equipment.name) {
+                  return; // 如果已經選中了相同的 UE，則不重複操作
+                }
+                console.log(`Clicked ${equipment.name}`);
+                this.selectedUeName = equipment.name;
+                this.startUpdatingRsrp(equipment.apiUrl, equipment.name, stage);
               });
             }
 
@@ -116,7 +128,40 @@ export class FloorPlanComponent implements OnInit {
           backgroundColor: 'white',
         });
         layer.add(this.tooltip);
-        this.tooltip.zIndex(999); // 確保 tooltip 在最上層
+        this.tooltip.zIndex(7); // 確保 tooltip 在最上層
+
+        // 初始化顯示 RSRP 的文字框
+        this.rsrpText = new Konva.Text({
+          text: '',
+          x: stageWidth - 350, // 設置在右上角
+          y: 20,
+          fontSize: 16,
+          padding: 5,
+          fill: 'blue',
+          visible: false,
+          id: 'rsrpText',
+        });
+        layer.add(this.rsrpText);
+        this.rsrpText.zIndex(6); // 確保 RSRP 顯示在最上層
+
+        // 初始化關閉按鈕
+        this.closeButton = new Konva.Rect({
+          x: stageWidth - 50, // 設置在右上角顯示框旁邊
+          y: 20,
+          width: 20,
+          height: 20,
+          fill: 'red',
+          visible: false,
+          id: 'closeButton',
+        });
+        layer.add(this.closeButton);
+        this.closeButton.zIndex(6); // 確保關閉按鈕在最上層
+
+        // 關閉按鈕的點擊事件
+        this.closeButton.on('click', () => {
+          console.log('Close button clicked');
+          this.stopUpdatingRsrp();
+        });
 
         layer.draw();
       });
@@ -126,9 +171,9 @@ export class FloorPlanComponent implements OnInit {
   // 函數用來顯示 tooltip
   private showTooltip(x: number, y: number, text: string) {
     this.tooltip.text(text);
-    this.tooltip.position({ x: x + 10, y: y + 10 });
+    this.tooltip.position({ x: x + 10, y: y - 20 });
     this.tooltip.visible(true);
-    this.tooltip.zIndex(999); // 確保每次顯示 tooltip 時它都在最上層
+    this.tooltip.zIndex(6); // 確保每次顯示 tooltip 時它都在最上層
     this.tooltip.getLayer()?.batchDraw(); // 使用 batchDraw 以提高性能
     console.log('Tooltip shown with text:', text);
   }
@@ -140,16 +185,58 @@ export class FloorPlanComponent implements OnInit {
     console.log('Tooltip hidden');
   }
 
-  // 查詢 UE 的即時 RSRP 值
-  private queryRsrp(apiUrl: string, equipmentName: string) {
-    this.http.get(apiUrl, { responseType: 'text' }).subscribe(
-      (rsrp) => {
-        console.log(`RSRP for ${equipmentName}: ${rsrp}`);
-        alert(`${equipmentName} RSRP: ${rsrp}`); // 可以用更好的 UI 替代
-      },
-      (error) => {
-        console.error(`Failed to get RSRP for ${equipmentName}`, error);
-      }
-    );
+  // 查詢 UE 的即時 RSRP 值，並開始不斷刷新
+  private startUpdatingRsrp(apiUrl: string, equipmentName: string, stage: Konva.Stage) {
+    // 如果已有正在更新的 Interval，先清除
+    if (this.rsrpInterval) {
+      clearInterval(this.rsrpInterval);
+    }
+
+    // 設定定時器，每隔 2 秒查詢一次 RSRP 值
+    this.rsrpInterval = setInterval(() => {
+      this.http.get(apiUrl, { responseType: 'text' }).subscribe(
+        (response) => {
+          try {
+            const data = JSON.parse(response); // 解析 JSON 字符串
+            const rsrp = data.rsrp; // 提取 rsrp 值
+            this.rsrpValue = `${equipmentName} - RSRP: ${rsrp}`;
+            console.log(`RSRP for ${equipmentName}: ${rsrp}`);
+            this.updateRsrpText(this.rsrpValue);
+          } catch (error) {
+            console.error('Failed to parse JSON response', error);
+          }
+        },
+        (error) => {
+          console.error(`Failed to get RSRP for ${equipmentName}`, error);
+        }
+      );
+    }, 2000);
+
+
+    // 顯示 RSRP 顯示框和關閉按鈕
+    this.rsrpText.visible(true);
+    this.rsrpText.zIndex(7); // 確保 RSRP 顯示在最上層
+    this.closeButton.visible(true);
+    this.closeButton.zIndex(7); // 確保關閉按鈕在最上層
+    this.rsrpText.getLayer()?.batchDraw();
+  }
+
+  // 更新右上角的 RSRP 顯示框
+  private updateRsrpText(text: string) {
+    this.rsrpText.text(text);
+    this.rsrpText.getLayer()?.batchDraw();
+  }
+
+  // 停止查詢 RSRP
+  stopUpdatingRsrp() {
+    if (this.rsrpInterval) {
+      clearInterval(this.rsrpInterval);
+      this.rsrpInterval = null;
+    }
+    this.selectedUeName = null;
+    this.rsrpValue = null;
+    this.rsrpText.visible(false);
+    this.closeButton.visible(false);
+    this.rsrpText.getLayer()?.batchDraw();
   }
 }
