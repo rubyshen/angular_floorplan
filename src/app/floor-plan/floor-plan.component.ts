@@ -8,25 +8,21 @@ import Konva from 'konva';
   styleUrls: ['./floor-plan.component.css']
 })
 export class FloorPlanComponent implements OnInit {
-  // 假設 floor-plan 的實際大小為 20m x 15m
   private realWidthMeters = 20;
   private realHeightMeters = 15;
 
   private equipments = [
-    { type: 'BS', name: 'Base Station 1', x: 5, y: 4, imageUrl: 'assets/img/gnb.png' },
-    { type: 'UE', name: 'User Equipment 1', x: 10, y: 8, imageUrl: 'assets/img/ue.png', apiUrl: 'http://localhost:5000/rsrp' },
-    { type: 'RIS', name: 'RIS Unit 1', x: 15, y: 6, imageUrl: 'assets/img/ris.png' },
-    { type: 'UE', name: 'User Equipment 2', x: 9, y: 7, imageUrl: 'assets/img/ue.png', apiUrl: 'http://localhost:5000/rsrp' }
+    { type: 'BS', name: 'Base Station 1', x: 0.5, y: 13.5, imageUrl: 'assets/img/gnb.png' },
+    { type: 'RIS', name: 'RIS Unit 1', x: 6, y: 7, imageUrl: 'assets/img/ris.png' },
+    { type: 'UE', name: 'User Equipment 1', x: 12, y: 10, imageUrl: 'assets/img/ue.png', apiUrl: 'http://localhost:5000/rsrp' },
+    { type: 'UE', name: 'User Equipment 2', x: 15, y: 13.5, imageUrl: 'assets/img/ue.png', apiUrl: 'http://localhost:5000/rsrp' }
   ];
 
-  private tooltip!: Konva.Text; // 用於設備懸停的 tooltip
-  private rsrpText!: Konva.Text; // 用於顯示 UE 的 RSRP 值的文字框
-  private closeButton!: Konva.Rect; // 關閉按鈕
-
-  // 存儲目前正在查詢 RSRP 的 UE 的相關資訊
+  private tooltip!: Konva.Text;
+  private rsrpGroup!: Konva.Group;
+  private rsrpInterval: any;
   selectedUeName: string | null = null;
   rsrpValue: string | null = null;
-  rsrpInterval: any;
 
   constructor(private http: HttpClient) { }
 
@@ -35,22 +31,18 @@ export class FloorPlanComponent implements OnInit {
     const stageWidth = containerElement?.clientWidth || 800;
     const stageHeight = containerElement?.clientHeight || 600;
 
-    // 初始化 Konva 舞台
     const stage = new Konva.Stage({
-      container: 'container', // 容器 ID，對應 HTML 中的 div
+      container: 'container',
       width: stageWidth,
       height: stageHeight,
     });
 
-    // 創建圖層
     const layer = new Konva.Layer();
     stage.add(layer);
 
-    // 計算縮放比例
     const scaleX = stageWidth / this.realWidthMeters;
     const scaleY = stageHeight / this.realHeightMeters;
 
-    // 設置底圖的 Promise
     const backgroundImagePromise = new Promise<void>((resolve) => {
       Konva.Image.fromURL('assets/img/floor-plan.png', (image) => {
         image.setAttrs({
@@ -65,7 +57,6 @@ export class FloorPlanComponent implements OnInit {
       });
     });
 
-    // 確保背景圖先加載完成，再繪製設備
     backgroundImagePromise.then(() => {
       const equipmentPromises = this.equipments.map((equipment) => {
         return new Promise<void>((resolve) => {
@@ -73,38 +64,36 @@ export class FloorPlanComponent implements OnInit {
             equipImage.setAttrs({
               x: equipment.x * scaleX,
               y: equipment.y * scaleY,
-              width: 1 * scaleX, // 設備圖標的寬度（設為 1m 對應於畫布縮放後的寬度）
-              height: 1 * scaleY, // 設備圖標的高度
-              draggable: false, // 第一版不允許拖曳
+              width: 1 * scaleX,
+              height: 1 * scaleY,
+              draggable: false,
               id: equipment.name,
             });
             layer.add(equipImage);
             console.log(`${equipment.type} image loaded and added to layer.`);
 
-            // 當點擊 UE 時，查詢即時 RSRP 值並開始不斷刷新
             if (equipment.type === 'UE' && equipment.apiUrl) {
               equipImage.on('click', () => {
                 if (this.selectedUeName === equipment.name) {
-                  return; // 如果已經選中了相同的 UE，則不重複操作
+                  return;
                 }
                 console.log(`Clicked ${equipment.name}`);
                 this.selectedUeName = equipment.name;
-                this.startUpdatingRsrp(equipment.apiUrl, equipment.name, stage);
+                this.startUpdatingRsrp(equipment.apiUrl, equipment.name, layer);
               });
             }
 
-            // 設備懸停顯示 tooltip
             equipImage.on('mouseover', () => {
               console.log(`Mouse over ${equipment.name}`);
               const xMeters = equipment.x;
               const yMeters = equipment.y;
-              this.showTooltip(equipImage.x(), equipImage.y(), `${equipment.name}: x: ${xMeters}, y: ${yMeters}`);
+              this.showTooltip(equipImage.x(), equipImage.y(), `${equipment.name}:\n (${xMeters}, ${yMeters})`);
             });
             equipImage.on('mousemove', () => {
               console.log(`Mouse move over ${equipment.name}`);
               const xMeters = equipment.x;
               const yMeters = equipment.y;
-              this.showTooltip(equipImage.x(), equipImage.y(), `${equipment.name}: x: ${xMeters}, y: ${yMeters}`);
+              this.showTooltip(equipImage.x(), equipImage.y(), `${equipment.name}:\n (${xMeters}, ${yMeters})`);
             });
             equipImage.on('mouseout', () => {
               console.log(`Mouse out from ${equipment.name}`);
@@ -116,9 +105,7 @@ export class FloorPlanComponent implements OnInit {
         });
       });
 
-      // 等待所有設備加載完成後再繪製
       Promise.all(equipmentPromises).then(() => {
-        // 初始化 Tooltip
         this.tooltip = new Konva.Text({
           text: '',
           fontSize: 16,
@@ -128,106 +115,123 @@ export class FloorPlanComponent implements OnInit {
           backgroundColor: 'white',
         });
         layer.add(this.tooltip);
-        this.tooltip.zIndex(7); // 確保 tooltip 在最上層
+        this.tooltip
 
-        // 初始化顯示 RSRP 的文字框
-        this.rsrpText = new Konva.Text({
-          text: '',
-          x: stageWidth - 350, // 設置在右上角
+        this.rsrpGroup = new Konva.Group({
+          x: stageWidth - 350,
           y: 20,
-          fontSize: 16,
-          padding: 5,
-          fill: 'blue',
           visible: false,
+        });
+
+        const background = new Konva.Rect({
+          width: 300,
+          height: 80,
+          fill: 'lightgray',
+          cornerRadius: 10,
+          shadowBlur: 10,
+        });
+
+        const rsrpText = new Konva.Text({
+          text: '',
+          fontSize: 16,
+          padding: 10,
+          lineHeight: 1.5,
+          fill: 'blue',
           id: 'rsrpText',
         });
-        layer.add(this.rsrpText);
-        this.rsrpText.zIndex(6); // 確保 RSRP 顯示在最上層
 
-        // 初始化關閉按鈕
-        this.closeButton = new Konva.Rect({
-          x: stageWidth - 50, // 設置在右上角顯示框旁邊
+        const closeButton = new Konva.Circle({
+          x: 280,
           y: 20,
-          width: 20,
-          height: 20,
-          fill: 'red',
-          visible: false,
-          id: 'closeButton',
+          radius: 10,
+          fill: 'white',
+          stroke: 'black',
+          strokeWidth: 2,
         });
-        layer.add(this.closeButton);
-        this.closeButton.zIndex(6); // 確保關閉按鈕在最上層
 
-        // 關閉按鈕的點擊事件
-        this.closeButton.on('click', () => {
+        const closeButtonText = new Konva.Text({
+          text: 'X',
+          x: 273,
+          y: 11,
+          fontSize: 20,
+          fill: 'black',
+          fontStyle: 'bold',
+        });
+
+        // closeButton.on('click', () => {
+        //   console.log('Close button clicked');
+        //   this.stopUpdatingRsrp();
+        // });
+
+        closeButtonText.on('click', () => {
           console.log('Close button clicked');
           this.stopUpdatingRsrp();
         });
+
+        this.rsrpGroup.add(background);
+        this.rsrpGroup.add(rsrpText);
+        this.rsrpGroup.add(closeButton);
+        this.rsrpGroup.add(closeButtonText);
+        layer.add(this.rsrpGroup);
 
         layer.draw();
       });
     });
   }
 
-  // 函數用來顯示 tooltip
   private showTooltip(x: number, y: number, text: string) {
     this.tooltip.text(text);
-    this.tooltip.position({ x: x + 10, y: y - 20 });
+    this.tooltip.position({ x: x + 30, y: y - 20 });
     this.tooltip.visible(true);
-    this.tooltip.zIndex(6); // 確保每次顯示 tooltip 時它都在最上層
-    this.tooltip.getLayer()?.batchDraw(); // 使用 batchDraw 以提高性能
+    this.tooltip
+    this.tooltip.getLayer()?.batchDraw();
     console.log('Tooltip shown with text:', text);
   }
 
-  // 函數用來隱藏 tooltip
   private hideTooltip() {
     this.tooltip.visible(false);
     this.tooltip.getLayer()?.batchDraw();
     console.log('Tooltip hidden');
   }
 
-  // 查詢 UE 的即時 RSRP 值，並開始不斷刷新
-  private startUpdatingRsrp(apiUrl: string, equipmentName: string, stage: Konva.Stage) {
-    // 如果已有正在更新的 Interval，先清除
-    if (this.rsrpInterval) {
-      clearInterval(this.rsrpInterval);
-    }
-
-    // 設定定時器，每隔 2 秒查詢一次 RSRP 值
-    this.rsrpInterval = setInterval(() => {
-      this.http.get(apiUrl, { responseType: 'text' }).subscribe(
-        (response) => {
-          try {
-            const data = JSON.parse(response); // 解析 JSON 字符串
-            const rsrp = data.rsrp; // 提取 rsrp 值
-            this.rsrpValue = `${equipmentName} - RSRP: ${rsrp}`;
-            console.log(`RSRP for ${equipmentName}: ${rsrp}`);
-            this.updateRsrpText(this.rsrpValue);
-          } catch (error) {
-            console.error('Failed to parse JSON response', error);
-          }
-        },
-        (error) => {
-          console.error(`Failed to get RSRP for ${equipmentName}`, error);
+  private updateRsrp(apiUrl: string, equipmentName: string, layer: Konva.Layer) {
+    this.http.get(apiUrl, { responseType: 'text' }).subscribe(
+      (response) => {
+        try {
+          const data = JSON.parse(response);
+          const rsrp = data.rsrp;
+          this.rsrpValue = `${equipmentName} - RSRP: ${rsrp}`;
+          console.log(`RSRP for ${equipmentName}: ${rsrp}`);
+          const rsrpText = this.rsrpGroup.findOne<Konva.Text>('#rsrpText');
+          rsrpText?.text(`${equipmentName}\nRSRP: ${rsrp}`);
+          layer.batchDraw();
+        } catch (error) {
+          console.error('Failed to parse JSON response', error);
         }
-      );
-    }, 2000);
-
-
-    // 顯示 RSRP 顯示框和關閉按鈕
-    this.rsrpText.visible(true);
-    this.rsrpText.zIndex(7); // 確保 RSRP 顯示在最上層
-    this.closeButton.visible(true);
-    this.closeButton.zIndex(7); // 確保關閉按鈕在最上層
-    this.rsrpText.getLayer()?.batchDraw();
+      },
+      (error) => {
+        console.error(`Failed to get RSRP for ${equipmentName}`, error);
+      }
+    );
   }
 
-  // 更新右上角的 RSRP 顯示框
-  private updateRsrpText(text: string) {
-    this.rsrpText.text(text);
-    this.rsrpText.getLayer()?.batchDraw();
+  private startUpdatingRsrp(apiUrl: string, equipmentName: string, layer: Konva.Layer) {
+  // 立即执行一次HTTP请求以获取RSRP值
+  this.updateRsrp(apiUrl, equipmentName, layer);
+
+  // 设置定时器，每秒更新RSRP值
+  if (this.rsrpInterval) {
+    clearInterval(this.rsrpInterval);
+  }
+  this.rsrpInterval = setInterval(() => {
+    this.updateRsrp(apiUrl, equipmentName, layer);
+  }, 1000);
+
+  // 显示RSRP信息组
+  this.rsrpGroup.visible(true);
+  layer.batchDraw();
   }
 
-  // 停止查詢 RSRP
   stopUpdatingRsrp() {
     if (this.rsrpInterval) {
       clearInterval(this.rsrpInterval);
@@ -235,8 +239,7 @@ export class FloorPlanComponent implements OnInit {
     }
     this.selectedUeName = null;
     this.rsrpValue = null;
-    this.rsrpText.visible(false);
-    this.closeButton.visible(false);
-    this.rsrpText.getLayer()?.batchDraw();
+    this.rsrpGroup.visible(false);
+    this.rsrpGroup.getLayer()?.batchDraw();
   }
 }
