@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import Konva from 'konva';
 
 @Component({
@@ -13,12 +14,14 @@ export class FloorPlanComponent implements OnInit {
 
   private equipments = [
     { type: 'BS', name: 'Base Station 1', x: 5, y: 4, imageUrl: 'assets/img/gnb.png' },
-    { type: 'UE', name: 'User Equipment 1', x: 10, y: 8, imageUrl: 'assets/img/ue.png' },
+    { type: 'UE', name: 'User Equipment 1', x: 10, y: 8, imageUrl: 'assets/img/ue.png', apiUrl: 'http://localhost:5000/rsrp' },
     { type: 'RIS', name: 'RIS Unit 1', x: 15, y: 6, imageUrl: 'assets/img/ris.png' },
-    { type: 'UE', name: 'User Equipment 2', x: 9, y: 7, imageUrl: 'assets/img/ue.png' }
+    { type: 'UE', name: 'User Equipment 2', x: 9, y: 7, imageUrl: 'assets/img/ue.png', apiUrl: 'http://localhost:5000/rsrp' }
   ];
 
-  constructor() { }
+  private tooltip!: Konva.Text;
+
+  constructor(private http: HttpClient) { }
 
   ngOnInit(): void {
     const containerElement = document.getElementById('container');
@@ -57,67 +60,43 @@ export class FloorPlanComponent implements OnInit {
 
     // 確保背景圖先加載完成，再繪製設備
     backgroundImagePromise.then(() => {
-      // 初始化 Tooltip
-      const tooltip = new Konva.Text({
-        text: '',
-        fontSize: 16,
-        padding: 5,
-        visible: false,
-        fill: 'black',
-        zIndex: 999, // 設置較高的 zIndex 確保 tooltip 在最前面
-      });
-      layer.add(tooltip);
-      tooltip.moveToTop(); // 確保 tooltip 總是被移到最上層
-
-      // 函數用來顯示 tooltip
-      const showTooltip = (x: number, y: number, text: string) => {
-        tooltip.text(text);
-        tooltip.position({ x: x + 10, y: y + 10 });
-        tooltip.visible(true);
-        tooltip.moveToTop(); // 確保 tooltip 在所有元素上方
-        layer.batchDraw(); // 使用 batchDraw 以提高性能
-        console.log('Tooltip shown with text:', text);
-      };
-
-      // 函數用來隱藏 tooltip
-      const hideTooltip = () => {
-        tooltip.visible(false);
-        layer.batchDraw();
-        console.log('Tooltip hidden');
-      };
-
       const equipmentPromises = this.equipments.map((equipment) => {
         return new Promise<void>((resolve) => {
           Konva.Image.fromURL(equipment.imageUrl, (equipImage) => {
-            const equipmentId = encodeURIComponent(equipment.name);
             equipImage.setAttrs({
               x: equipment.x * scaleX,
               y: equipment.y * scaleY,
               width: 1 * scaleX, // 設備圖標的寬度（設為 1m 對應於畫布縮放後的寬度）
               height: 1 * scaleY, // 設備圖標的高度
               draggable: false, // 第一版不允許拖曳
-              id: equipmentId, // 使用唯一的 name 作為 ID
-              zIndex: 1, // 設置較低的 zIndex
+              id: equipment.name,
             });
             layer.add(equipImage);
             console.log(`${equipment.type} image loaded and added to layer.`);
+
+            // 當點擊 UE 時，查詢即時 RSRP 值
+            if (equipment.type === 'UE' && equipment.apiUrl) {
+              equipImage.on('click', () => {
+                this.queryRsrp(equipment.apiUrl as string, equipment.name);
+              });
+            }
 
             // 設備懸停顯示 tooltip
             equipImage.on('mouseover', () => {
               console.log(`Mouse over ${equipment.name}`);
               const xMeters = equipment.x;
               const yMeters = equipment.y;
-              showTooltip(equipImage.x(), equipImage.y(), `${equipment.name}: x: ${xMeters}, y: ${yMeters}`);
+              this.showTooltip(equipImage.x(), equipImage.y(), `${equipment.name}: x: ${xMeters}, y: ${yMeters}`);
             });
             equipImage.on('mousemove', () => {
               console.log(`Mouse move over ${equipment.name}`);
               const xMeters = equipment.x;
               const yMeters = equipment.y;
-              showTooltip(equipImage.x(), equipImage.y(), `${equipment.name}: x: ${xMeters}, y: ${yMeters}`);
+              this.showTooltip(equipImage.x(), equipImage.y(), `${equipment.name}: x: ${xMeters}, y: ${yMeters}`);
             });
             equipImage.on('mouseout', () => {
               console.log(`Mouse out from ${equipment.name}`);
-              hideTooltip();
+              this.hideTooltip();
             });
 
             resolve();
@@ -127,8 +106,50 @@ export class FloorPlanComponent implements OnInit {
 
       // 等待所有設備加載完成後再繪製
       Promise.all(equipmentPromises).then(() => {
+        // 初始化 Tooltip
+        this.tooltip = new Konva.Text({
+          text: '',
+          fontSize: 16,
+          padding: 5,
+          visible: false,
+          fill: 'black',
+          backgroundColor: 'white',
+        });
+        layer.add(this.tooltip);
+        this.tooltip.zIndex(999); // 確保 tooltip 在最上層
+
         layer.draw();
       });
     });
+  }
+
+  // 函數用來顯示 tooltip
+  private showTooltip(x: number, y: number, text: string) {
+    this.tooltip.text(text);
+    this.tooltip.position({ x: x + 10, y: y + 10 });
+    this.tooltip.visible(true);
+    this.tooltip.zIndex(999); // 確保每次顯示 tooltip 時它都在最上層
+    this.tooltip.getLayer()?.batchDraw(); // 使用 batchDraw 以提高性能
+    console.log('Tooltip shown with text:', text);
+  }
+
+  // 函數用來隱藏 tooltip
+  private hideTooltip() {
+    this.tooltip.visible(false);
+    this.tooltip.getLayer()?.batchDraw();
+    console.log('Tooltip hidden');
+  }
+
+  // 查詢 UE 的即時 RSRP 值
+  private queryRsrp(apiUrl: string, equipmentName: string) {
+    this.http.get(apiUrl, { responseType: 'text' }).subscribe(
+      (rsrp) => {
+        console.log(`RSRP for ${equipmentName}: ${rsrp}`);
+        alert(`${equipmentName} RSRP: ${rsrp}`); // 可以用更好的 UI 替代
+      },
+      (error) => {
+        console.error(`Failed to get RSRP for ${equipmentName}`, error);
+      }
+    );
   }
 }
