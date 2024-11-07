@@ -1,6 +1,60 @@
 # iRM_ITRI
 ITRI iRM with o-cloud GUI style project
 
+---
+# npm
+> --legacy-peer-deps
+
+---
+# Rsrp proxy, get QUB RIS info 
+```
+from flask import Flask, jsonify
+import requests
+
+app = Flask(__name__)
+
+# 允許 CORS
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    return response
+
+# 代理端點
+@app.route('/rsrp', methods=['GET'])
+def get_rsrp():
+    # RIS 伺服器 URL
+    ris_server_url = 'http://ris.m10.site/api/get_ris_info'
+    
+    try:
+        # 向 RIS 伺服器發送請求
+        response = requests.get(ris_server_url)
+        response.raise_for_status()  # 如果有錯誤狀態碼則拋出異常
+        
+        # 解析 RIS 伺服器的 JSON 響應
+        data = response.json()
+        received_power = data.get('received_power', {})
+        
+        # 構造只包含所需欄位的響應
+        result = {
+            'min_value': received_power.get('min_value', None),
+            'max_value': received_power.get('max_value', None),
+            'unit': received_power.get('unit', None)
+        }
+        
+        return jsonify(result), 200
+    except requests.RequestException as e:
+        # 如果請求失敗，返回錯誤信息
+        return jsonify({'error': 'Failed to fetch received power data'}), 500
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
+
+```
+
+---
+
 # Mockup UE with RSRP values
 ## install flask and flask_cors
 

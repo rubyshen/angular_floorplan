@@ -15,7 +15,6 @@ export class FloorPlanComponent implements OnInit {
     { type: 'BS', name: 'Base Station 1', x: 0.5, y: 13.5, imageUrl: 'assets/img/gnb.png' },
     { type: 'RIS', name: 'RIS Unit 1', x: 6, y: 7, imageUrl: 'assets/img/ris.png' },
     { type: 'UE', name: 'User Equipment 1', x: 12, y: 10, imageUrl: 'assets/img/ue.png', apiUrl: 'http://localhost:5000/rsrp' },
-    { type: 'UE', name: 'User Equipment 2', x: 15, y: 13.5, imageUrl: 'assets/img/ue.png', apiUrl: 'http://localhost:5000/rsrp' }
   ];
 
   private tooltip!: Konva.Text;
@@ -193,43 +192,52 @@ export class FloorPlanComponent implements OnInit {
     this.tooltip.getLayer()?.batchDraw();
     console.log('Tooltip hidden');
   }
-
   private updateRsrp(apiUrl: string, equipmentName: string, layer: Konva.Layer) {
     this.http.get(apiUrl, { responseType: 'text' }).subscribe(
       (response) => {
         try {
           const data = JSON.parse(response);
-          const rsrp = data.rsrp;
-          this.rsrpValue = `${equipmentName} - RSRP: ${rsrp}`;
-          console.log(`RSRP for ${equipmentName}: ${rsrp}`);
+          console.log("Received data:", data); // 添加除錯，檢查 JSON 整體內容
+  
+          // 直接從 data 提取 min_value 和 max_value
+          const min = data.min_value;
+          const max = data.max_value;
+  
+          // 顯示正確的內容
+          this.rsrpValue = `${equipmentName} - Max: ${max}, Min: ${min}`;
+          console.log(`Received Power for ${equipmentName}: Max=${max}, Min=${min}`);
+  
           const rsrpText = this.rsrpGroup.findOne<Konva.Text>('#rsrpText');
-          rsrpText?.text(`${equipmentName}\nRSRP: ${rsrp}`);
+          rsrpText?.text(`${equipmentName}\nMax: ${max}\nMin: ${min}`);
+          
           layer.batchDraw();
         } catch (error) {
           console.error('Failed to parse JSON response', error);
         }
       },
       (error) => {
-        console.error(`Failed to get RSRP for ${equipmentName}`, error);
+        console.error(`Failed to get received power for ${equipmentName}`, error);
       }
     );
   }
+  
+  
 
   private startUpdatingRsrp(apiUrl: string, equipmentName: string, layer: Konva.Layer) {
-  // 立即执行一次HTTP请求以获取RSRP值
-  this.updateRsrp(apiUrl, equipmentName, layer);
-
-  // 设置定时器，每秒更新RSRP值
-  if (this.rsrpInterval) {
-    clearInterval(this.rsrpInterval);
-  }
-  this.rsrpInterval = setInterval(() => {
+    // 立即执行一次HTTP请求以获取RSRP值
     this.updateRsrp(apiUrl, equipmentName, layer);
-  }, 1000);
 
-  // 显示RSRP信息组
-  this.rsrpGroup.visible(true);
-  layer.batchDraw();
+    // 设置定时器，每秒更新RSRP值
+    if (this.rsrpInterval) {
+      clearInterval(this.rsrpInterval);
+    }
+    this.rsrpInterval = setInterval(() => {
+      this.updateRsrp(apiUrl, equipmentName, layer);
+    }, 1000);
+
+    // 显示RSRP信息组
+    this.rsrpGroup.visible(true);
+    layer.batchDraw();
   }
 
   stopUpdatingRsrp() {
