@@ -9,12 +9,12 @@ import Konva from 'konva';
 })
 export class FloorPlanComponent implements OnInit {
   private realWidthMeters = 20;
-  private realHeightMeters = 15;
+  private realHeightMeters = 16;
 
   private equipments = [
-    { type: 'BS', name: 'Base Station 1', x: 0.5, y: 13.5, imageUrl: 'assets/img/gnb.png' },
-    { type: 'RIS', name: 'RIS Unit 1', x: 6, y: 7, imageUrl: 'assets/img/ris.png' },
-    { type: 'UE', name: 'User Equipment 1', x: 12, y: 10, imageUrl: 'assets/img/ue.png', apiUrl: 'http://localhost:5000/rsrp' },
+    { type: 'BS', name: 'Tx', x: 10, y: 1, imageUrl: 'assets/img/gnb.png' },
+    { type: 'RIS', name: 'QUB RIS', x: 18, y: 1, imageUrl: 'assets/img/ris.png' },
+    { type: 'UE', name: 'Rx', x: 6, y: 8, imageUrl: 'assets/img/ue.png', apiUrl: 'http://localhost:5000/rsrp' },
   ];
 
   private tooltip!: Konva.Text;
@@ -86,13 +86,15 @@ export class FloorPlanComponent implements OnInit {
               console.log(`Mouse over ${equipment.name}`);
               const xMeters = equipment.x;
               const yMeters = equipment.y;
-              this.showTooltip(equipImage.x(), equipImage.y(), `${equipment.name}:\n (${xMeters}, ${yMeters})`);
+              // this.showTooltip(equipImage.x(), equipImage.y(), `${equipment.name}:\n (${xMeters}, ${yMeters})`);
+              this.showTooltip(equipImage.x(), equipImage.y(), `${equipment.name}`);
             });
             equipImage.on('mousemove', () => {
               console.log(`Mouse move over ${equipment.name}`);
               const xMeters = equipment.x;
               const yMeters = equipment.y;
-              this.showTooltip(equipImage.x(), equipImage.y(), `${equipment.name}:\n (${xMeters}, ${yMeters})`);
+              // this.showTooltip(equipImage.x(), equipImage.y(), `${equipment.name}:\n (${xMeters}, ${yMeters})`);
+              this.showTooltip(equipImage.x(), equipImage.y(), `${equipment.name}`);
             });
             equipImage.on('mouseout', () => {
               console.log(`Mouse out from ${equipment.name}`);
@@ -118,7 +120,7 @@ export class FloorPlanComponent implements OnInit {
 
         this.rsrpGroup = new Konva.Group({
           x: stageWidth - 350,
-          y: 20,
+          y: stageHeight - 100,
           visible: false,
         });
 
@@ -180,7 +182,7 @@ export class FloorPlanComponent implements OnInit {
 
   private showTooltip(x: number, y: number, text: string) {
     this.tooltip.text(text);
-    this.tooltip.position({ x: x + 30, y: y - 20 });
+    this.tooltip.position({ x: x - 20, y: y + 20 });
     this.tooltip.visible(true);
     this.tooltip
     this.tooltip.getLayer()?.batchDraw();
