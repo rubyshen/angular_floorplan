@@ -105,5 +105,5 @@ export const TwLanguage = {
 
   'architecture.mgmt':'系統架構',
 
-  
+  'floor.plan' : '平面圖'
 }

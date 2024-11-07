@@ -7,15 +7,27 @@ import Konva from 'konva';
   templateUrl: './floor-plan.component.html',
   styleUrls: ['./floor-plan.component.css']
 })
+
 export class FloorPlanComponent implements OnInit {
   private realWidthMeters = 20;
   private realHeightMeters = 16;
 
   private equipments = [
-    { type: 'BS', name: 'Tx', x: 10, y: 1, imageUrl: 'assets/img/gnb.png' },
+    { type: 'BS', name: 'Tx', x: 5, y: 1, imageUrl: 'assets/img/gnb.png' },
     { type: 'RIS', name: 'QUB RIS', x: 18, y: 1, imageUrl: 'assets/img/ris.png' },
-    { type: 'UE', name: 'Rx', x: 6, y: 8, imageUrl: 'assets/img/ue.png', apiUrl: 'http://localhost:5000/rsrp' },
+    { type: 'UE', name: 'Rx', x: 7, y: 9, imageUrl: 'assets/img/ue.png', apiUrl: 'http://localhost:5000/rsrp' },
   ];
+
+  
+  // export class FloorPlanComponent implements OnInit {
+  // private realWidthMeters = 50;
+  // private realHeightMeters = 40;
+
+  // private equipments = [
+  //   { type: 'BS', name: 'Tx', x: 26, y: 2, imageUrl: 'assets/img/gnb.png' },
+  //   { type: 'RIS', name: 'QUB RIS', x: 48, y: 2, imageUrl: 'assets/img/ris.png' },
+  //   { type: 'UE', name: 'Rx', x: 30, y: 30, imageUrl: 'assets/img/ue.png', apiUrl: 'http://localhost:5000/rsrp' },
+  // ]; 
 
   private tooltip!: Konva.Text;
   private rsrpGroup!: Konva.Group;
@@ -29,7 +41,7 @@ export class FloorPlanComponent implements OnInit {
     const containerElement = document.getElementById('container');
     const stageWidth = containerElement?.clientWidth || 800;
     const stageHeight = containerElement?.clientHeight || 600;
-
+    console.log(`stageWidth: ${stageWidth}, stageHeight: ${stageHeight}`);
     const stage = new Konva.Stage({
       container: 'container',
       width: stageWidth,
@@ -182,7 +194,7 @@ export class FloorPlanComponent implements OnInit {
 
   private showTooltip(x: number, y: number, text: string) {
     this.tooltip.text(text);
-    this.tooltip.position({ x: x - 20, y: y + 20 });
+    this.tooltip.position({ x: x - 20, y: y + 50 });
     this.tooltip.visible(true);
     this.tooltip
     this.tooltip.getLayer()?.batchDraw();

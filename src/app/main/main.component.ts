@@ -94,6 +94,9 @@ export class MainComponent implements OnInit {
     } else if (routerUrl.indexOf('/main/account-mgr') >= 0) {
       this.title = 'Account Management';
       this.page = 'account-management';
+    } else if (routerUrl.indexOf('/main/floor-plan') >= 0) {
+      this.title = 'Floor Plan';
+      this.page = 'floor-plan';
     }
   }
 
