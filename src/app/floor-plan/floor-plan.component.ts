@@ -222,7 +222,7 @@ export class FloorPlanComponent implements OnInit {
           console.log(`Received Power for ${equipmentName}: Max=${max}, Min=${min}`);
   
           const rsrpText = this.rsrpGroup.findOne<Konva.Text>('#rsrpText');
-          rsrpText?.text(`${equipmentName}\nMax: ${max}\nMin: ${min}`);
+          rsrpText?.text(`${equipmentName} RSRP\nMax: ${max}\nMin: ${min}`);
           
           layer.batchDraw();
         } catch (error) {
@@ -263,5 +263,22 @@ export class FloorPlanComponent implements OnInit {
     this.rsrpValue = null;
     this.rsrpGroup.visible(false);
     this.rsrpGroup.getLayer()?.batchDraw();
+    console.log('Stopped updating RSRP and hid rsrpGroup.');
   }
+
+  applyOptimizedProfile() {
+    const url = 'http://ris.m10.site/api/apply_ris_profile';
+    const body = { profile_id: 12 };
+    console.log("Sending request to apply profile 12");
+    this.http.post(url, body, { headers: { 'Content-Type': 'application/json' } })
+      .subscribe(
+        response => {
+          console.log('Profile applied successfully:', response);
+        },
+        error => {
+          console.error('Error applying profile:', error);
+        }
+      );
+  }
+  
 }
