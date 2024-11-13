@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { ApiForRISMgmt } from '../shared/api/For_RIS_Mgmt';
 import Konva from 'konva';
 
 @Component({
@@ -9,6 +10,11 @@ import Konva from 'konva';
 })
 
 export class FloorPlanComponent implements OnInit {
+  allRisDevices: any[] = [];
+  targetRisId: string = "";
+  QUB_RIS_URL = "http://ris.m10.site/api";
+  isLoading: boolean = false;
+  
   private realWidthMeters = 20;
   private realHeightMeters = 16;
 
@@ -35,9 +41,11 @@ export class FloorPlanComponent implements OnInit {
   selectedUeName: string | null = null;
   rsrpValue: string | null = null;
 
-  constructor(private http: HttpClient) { }
+  constructor(private risMgmtService: ApiForRISMgmt, private http: HttpClient) { }
 
   ngOnInit(): void {
+    
+    this.fetchRisDevices();
     const containerElement = document.getElementById('container');
     const stageWidth = containerElement?.clientWidth || 800;
     const stageHeight = containerElement?.clientHeight || 600;
@@ -266,19 +274,60 @@ export class FloorPlanComponent implements OnInit {
     console.log('Stopped updating RSRP and hid rsrpGroup.');
   }
 
-  applyOptimizedProfile() {
-    const url = 'http://ris.m10.site/api/apply_ris_profile';
-    const body = { profile_id: 12 };
-    console.log("Sending request to apply profile 12");
-    this.http.post(url, body, { headers: { 'Content-Type': 'application/json' } })
-      .subscribe(
-        response => {
-          console.log('Profile applied successfully:', response);
-        },
-        error => {
-          console.error('Error applying profile:', error);
+  applyOptimizedProfile(): void {
+    if (!this.targetRisId) {
+      console.error('Target RIS ID not found. Cannot apply profile.');
+      return;
+    }
+  
+    // Set loading state
+    this.isLoading = true;
+  
+    // Define the request body, similar to `applyRisProfile`
+    const body: any = {
+      risUrl: this.QUB_RIS_URL,             // Using the constant URL
+      globalRisId: this.targetRisId,        // Target RIS ID retrieved earlier
+      profileId: 12                         // Apply profile ID 12
+    };
+  
+    this.risMgmtService.apply_ris_profile(body).subscribe({
+      next: (res) => {
+        console.log('apply_ris_profile:', res);
+        if (res !== null) {
+          this.isLoading = false;
+          console.log(`Successfully applied profile ID 12 to RIS ID: ${this.targetRisId}`);
+          // Optionally, refresh data or update UI if necessary
+          this.fetchRisDevices();           // Refresh RIS devices if needed
         }
-      );
+      },
+      error: (error) => {
+        console.error('Error applying RIS profile:', error);
+        setTimeout(() => {
+          this.isLoading = false;
+        }, 3000);
+      }
+    });
   }
   
+  
+  fetchRisDevices(): void {
+    this.risMgmtService.getAllRisDevice().subscribe((devices: any[]) => {
+      this.allRisDevices = devices;
+
+    // Log each device's risUrl
+    this.allRisDevices.forEach(device => {
+      console.log('RIS URL:', device.risUrl);
+    });
+
+      const targetDevice = this.allRisDevices.find(device => device.risUrl === 'http://ris.m10.site/api');
+      if (targetDevice) {
+        this.targetRisId = targetDevice.id;
+        console.log('QUB RIS ID:', this.targetRisId);
+      }
+      else{
+        console.log('QUB RIS ID Not Found');
+      }
+    });
+  }
+
 }
