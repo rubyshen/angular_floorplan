@@ -215,7 +215,7 @@ export class RISInfoComponent implements OnInit {
     } else {
       this.apiForRISMgmt.getRisDeviceInfo(this.id).subscribe(
         res => {
-          console.log('getRisDeviceInfo:');
+          console.log('getRisDeviceInfo: Running Profile ID', res.running_profile.id);
           this.risInfo = res;
           this.elementArray = res.running_profile.elementArray;
           this.refresh();

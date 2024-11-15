@@ -215,7 +215,12 @@ export class FloorPlanComponent implements OnInit {
     console.log('Tooltip hidden');
   }
   private updateRsrp(apiUrl: string, equipmentName: string, layer: Konva.Layer) {
-    this.http.get(apiUrl, { responseType: 'text' }).subscribe(
+    this.http.get(apiUrl, { 
+      responseType: 'text', 
+      headers: {
+          'Cache-Control': 'no-cache'
+      }
+      }).subscribe(
       (response) => {
         try {
           const data = JSON.parse(response);
@@ -255,7 +260,7 @@ export class FloorPlanComponent implements OnInit {
     }
     this.rsrpInterval = setInterval(() => {
       this.updateRsrp(apiUrl, equipmentName, layer);
-    }, 1000);
+    }, 10000);
 
     // 显示RSRP信息组
     this.rsrpGroup.visible(true);

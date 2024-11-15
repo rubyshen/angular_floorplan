@@ -10,6 +10,69 @@ ITRI iRM with o-cloud GUI style project
 # Rsrp proxy, get QUB RIS info
 
 ## 最新版
+``` no cache
+from flask import Flask, jsonify
+import requests
+
+app = Flask(__name__)
+
+# 允許 CORS
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    
+    # 添加 no-cache 头部，防止缓存
+    response.headers.add('Cache-Control', 'no-cache')
+    
+    return response
+
+@app.route('/rsrp', methods=['GET'])
+def get_rsrp():
+    ris_server_url = 'http://ris.m10.site/api/get_ris_info'
+    
+    try:
+        # 設置請求的超時時間
+        response = requests.get(ris_server_url, timeout=0.9)
+        response.raise_for_status()  # 如果有錯誤狀態碼則拋出異常
+        
+        # 解析 JSON 響應
+        data = response.json()
+        received_power = data.get('received_power', {})
+        
+        # 構造響應結果
+        result = {
+            'min_value': received_power.get('min_value', None),
+            'max_value': received_power.get('max_value', None),
+            'unit': received_power.get('unit', None)
+        }
+        
+        # 打印結果到控制台
+        print("Received Power Data:", result)
+        
+        # 返回 JSON 給客戶端
+        return jsonify(result), 200
+    
+    except requests.exceptions.Timeout:
+        # 如果發生超時，返回 min_value 和 max_value 為 0 的 result 格式
+        print("Request timed out. Returning default values.")
+        result = {
+            'min_value': 0,
+            'max_value': 0,
+            'unit': None
+        }
+        return jsonify(result), 200
+    except requests.RequestException as e:
+        # 其他請求錯誤，返回錯誤信息
+        print("Error fetching received power data:", e)
+        return jsonify({'error': 'Failed to fetch received power data'}), 500
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
+
+```
+
 ```
 from flask import Flask, jsonify
 import requests
