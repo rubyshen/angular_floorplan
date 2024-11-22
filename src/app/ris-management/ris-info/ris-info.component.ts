@@ -377,4 +377,11 @@ export class RISInfoComponent implements OnInit {
   pageChanged(page: number) {
     this.p = page;
   }
+
+  isRunningProfileInList(): boolean {
+    if (!this.risInfo?.running_profile?.id) {
+      return false;
+    }
+    return this.risProfile.some(profile => profile.profileid === this.risInfo.running_profile.id);
+  }
 }

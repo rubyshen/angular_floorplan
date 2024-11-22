@@ -1,3 +1,4 @@
+<div *ngIf="isLoading" class="overlay"></div>
 <div class="ocloudInfo component">
   <h5>
     <button (click)="back()"><span class="material-icons">arrow_back</span>Back</button>
@@ -40,11 +41,13 @@
                 <label style="color :#d5d5d5">Running Profile ID</label>
                 <hr class="running-hr">
                 <li><label>RIS Profile ID</label><span>{{risInfo.running_profile.id}}</span></li>
-                <li><label>{{languageService.i18n['ris.polar']}}</label><span>{{risInfo.running_profile.angle.polar}}</span></li>
-                <li><label>{{languageService.i18n['ris.azimuth']}}</label><span>{{risInfo.running_profile.angle.azimuth}}</span></li>
+                <div *ngIf="isRunningProfileInList()">
+                  <li><label>{{languageService.i18n['ris.polar']}}</label><span>{{risInfo.running_profile.angle.polar}}</span></li>
+                  <li><label>{{languageService.i18n['ris.azimuth']}}</label><span>{{risInfo.running_profile.angle.azimuth}}</span></li>
+                </div>
               </ul>
             </div>
-            <div class="element-array-container">
+            <div *ngIf="isRunningProfileInList()" class="element-array-container">
               
               <div class="elementtable">
                 <table>
@@ -76,7 +79,7 @@
               <!-- localcellStyle -->
             </div>
             
-            <div class="element-array-container">
+            <div *ngIf="isRunningProfileInList()" class="element-array-container">
               <div class="elementtable">
                 <table>
                   <caption style="caption-side:top">{{languageService.i18n['ris.horizontal.element']}}</caption>
@@ -245,4 +248,3 @@
     </div>
   </div>
 </ng-template>
-
